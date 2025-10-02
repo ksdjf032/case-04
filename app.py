@@ -9,6 +9,19 @@ app = Flask(__name__)
 # Allow cross-origin requests so the static HTML can POST from localhost or file://
 CORS(app, resources={r"/v1/*": {"origins": "*"}})
 
+@app.route("/")
+def home():
+    """Default route so base URL doesn't 404."""
+    return jsonify({
+        "status": "ok",
+        "message": "Welcome to the Survey API",
+        "endpoints": {
+            "health_check": "/ping",
+            "submit_survey": "/v1/survey"
+        },
+        "utc_time": datetime.now(timezone.utc).isoformat()
+    })
+
 @app.route("/ping", methods=["GET"])
 def ping():
     """Simple health check endpoint."""
@@ -38,4 +51,6 @@ def submit_survey():
     return jsonify({"status": "ok"}), 201
 
 if __name__ == "__main__":
-    app.run(port=0, debug=True)
+    # Bind to all interfaces and a fixed port for easier access
+    app.run(host="0.0.0.0", port=5000, debug=True)
+
